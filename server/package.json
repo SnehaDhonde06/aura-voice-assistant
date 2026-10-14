@@ -10,7 +10,8 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "test": "vitest run"
+    "test": "vitest run",
+    "models": "tsx src/scripts/listModels.ts"
   },
   "dependencies": {
     "cors": "^2.8.5",

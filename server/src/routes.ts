@@ -4,6 +4,7 @@ import { LlmUnavailableError, runAgent } from "./services/llmService.js";
 import { listPublicOrders } from "./services/orderService.js";
 import { buildSummary, NoConversationError, TurnSchema } from "./services/summaryService.js";
 import { DEMO_DATA_LABEL } from "./data/orders.js";
+import { getLlmConfig } from "./services/llmConfig.js";
 
 export const api = Router();
 
@@ -17,9 +18,11 @@ const SummaryBody = z.object({ turns: z.array(TurnSchema).min(1).max(80) });
 const TtsBody = z.object({ text: z.string().min(1).max(500) });
 
 api.get("/health", (_req, res) => {
+  const cfg = getLlmConfig();
   res.json({
     ok: true,
-    llmConfigured: Boolean(process.env.GROQ_API_KEY),
+    llmConfigured: cfg !== null,
+    llmProvider: cfg?.provider ?? null,
     premiumTtsConfigured: Boolean(process.env.ELEVENLABS_API_KEY && process.env.ELEVENLABS_VOICE_ID),
   });
 });
