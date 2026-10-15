@@ -85,14 +85,39 @@ export function useCall() {
     setTurns(turnsRef.current);
   }, []);
 
-  const speak = useCallback(async (text: string, myEpoch: number) => {
+      const speak = useCallback(async (text: string, myEpoch: number) => {
     setCallState("speaking");
+
+    // Start a VAD loop: if the customer speaks while Aria is talking, interrupt.
+    let bargedIn = false;
+    const SILENCE_THRESHOLD = 0.04;
+    let loudFrames = 0;
+    const FRAMES_TO_TRIGGER = 8; // ~130 ms of audio above threshold
+    const vadId = window.setInterval(() => {
+      if (epoch.current !== myEpoch || !active.current) {
+        window.clearInterval(vadId);
+        return;
+      }
+      if (levelRef.current > SILENCE_THRESHOLD) {
+        loudFrames++;
+        if (loudFrames >= FRAMES_TO_TRIGGER && !bargedIn) {
+          bargedIn = true;
+          window.clearInterval(vadId);
+          tts.cancel();
+        }
+      } else {
+        loudFrames = 0;
+      }
+    }, 16);
+
     try {
       await tts.speak(text);
     } catch {
       if (epoch.current === myEpoch) {
-        setError("Aria's voice couldn't be played, but you can still read her reply on screen.");
+        setError("Aria's voice couldn't be played. You can still read her reply on screen.");
       }
+    } finally {
+      window.clearInterval(vadId);
     }
   }, []);
 

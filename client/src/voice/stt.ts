@@ -37,61 +37,79 @@ function getCtor(): RecCtor | undefined {
 export class BrowserStt implements SttProvider {
   readonly name = "browser-web-speech";
   private rec: Rec | null = null;
+  private _recs: Rec[] = [];
 
   isSupported(): boolean {
     return getCtor() !== undefined;
   }
 
-  start(events: SttEvents): void {
-    const Ctor = getCtor();
-    if (!Ctor) {
-      events.onError("not-supported");
-      return;
-    }
-    this.stop();
-    const rec = new Ctor();
-    rec.lang = "en-IN";
-    rec.continuous = false;
-    rec.interimResults = true;
+  isActive(): boolean {
+    return this.rec !== null;
+  }
 
-    rec.onresult = (e) => {
-      if (this.rec !== rec) return;
-      let interim = "";
-      let final = "";
-      for (let i = e.resultIndex; i < e.results.length; i++) {
-        const r = e.results[i];
-        if (r.isFinal) final += r[0].transcript;
-        else interim += r[0].transcript;
-      }
-      if (interim.trim()) events.onInterim(interim.trim());
-      if (final.trim()) events.onFinal(final.trim());
-    };
-    rec.onerror = (e) => {
-      if (this.rec !== rec) return;
-      events.onError(e.error);
-    };
-    rec.onend = () => {
-      if (this.rec !== rec) return;
+    start(events: SttEvents): void {
+      
+    const Ctor = getCtor();
+    if (!Ctor) { events.onError("not-supported"); return; }
+    this.stop();
+
+    // Try two recognizers in parallel: one tuned for Indian English and one for Hindi.
+    // The first final result wins and aborts the other. Interim text comes from whichever
+    // fires first, which gives natural-feeling feedback for both languages.
+    const LANGS = ["en-IN", "hi-IN"];
+    let settled = false;
+    const recs: Rec[] = [];
+
+    const settle = (final: string) => {
+      if (settled) return;
+      settled = true;
+      recs.forEach((r) => { try { r.abort(); } catch { /* already stopped */ } });
       this.rec = null;
+      events.onFinal(final);
       events.onEnd();
     };
 
-    this.rec = rec;
-    try {
-      rec.start();
-    } catch {
-      this.rec = null;
-      events.onError("start-failed");
+    for (const lang of LANGS) {
+      const rec = new Ctor();
+      rec.lang = lang;
+      rec.continuous = false;
+      rec.interimResults = true;
+
+      rec.onresult = (e) => {
+        if (settled && !recs.includes(rec as Rec)) return;
+        let interim = "";
+        let final = "";
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+          const r = e.results[i];
+          if (r.isFinal) final += r[0].transcript;
+          else interim += r[0].transcript;
+        }
+        if (interim.trim() && !settled) events.onInterim(interim.trim());
+        if (final.trim()) settle(final.trim());
+      };
+      rec.onerror = (e) => {
+        if (e.error === "no-speech" || e.error === "aborted") return;
+        // One recognizer erroring is not fatal if the other is still running.
+      };
+      rec.onend = () => {
+        // If both ended without a final result, emit onEnd so the call hook restarts.
+        const allDone = recs.every((r) => r === rec || !this.rec);
+        if (allDone && !settled) { settled = true; events.onEnd(); }
+      };
+
+      recs.push(rec);
+      // Stagger the second one slightly so Chrome doesn't block the second mic request.
+      window.setTimeout(() => { try { rec.start(); } catch { /* mic denied */ } }, lang === "hi-IN" ? 80 : 0);
     }
+
+    this.rec = recs[0];
+    this._recs = recs;
   }
 
-  stop(): void {
-    const rec = this.rec;
+    stop(): void {
+    const recs = [this.rec, ...this._recs].filter(Boolean) as Rec[];
     this.rec = null;
-    try {
-      rec?.abort();
-    } catch {
-      /* already stopped */
-    }
+    this._recs = [];
+    for (const r of recs) { try { r.abort(); } catch { /* already stopped */ } }
   }
 }

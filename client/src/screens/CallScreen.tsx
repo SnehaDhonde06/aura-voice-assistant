@@ -69,9 +69,11 @@ export function CallScreen({ call }: { call: CallApi }) {
       </form>
 
       <div className="controls">
-        {call.callState === "speaking" && (
-          <button className="btn btn--ghost" onClick={call.interrupt}>Skip</button>
-        )}
+       {call.callState === "speaking" && (
+  <p className="muted small" aria-live="polite">
+    Speak to interrupt Aria
+  </p>
+)}
         <button className="btn btn--end" onClick={() => void call.endCall()}>End call</button>
       </div>
     </section>

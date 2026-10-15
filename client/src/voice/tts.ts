@@ -29,6 +29,10 @@ export class BrowserTts implements TtsProvider {
     return typeof window !== "undefined" && "speechSynthesis" in window;
   }
 
+    isSpeaking(): boolean {
+    return window.speechSynthesis.speaking;
+  }
+
   // Some browsers (Safari) only allow speech after a user gesture: call from the click handler.
   prime(): void {
     if (!this.isSupported()) return;
