@@ -13,6 +13,12 @@ app.use("/api", rateLimit({ windowMs: 60_000, limit: 60, standardHeaders: true, 
 app.use("/api", api);
 
 const port = Number(process.env.PORT ?? 8787);
+if (process.env.RENDER) {
+  const selfUrl = `https://${process.env.RENDER_EXTERNAL_HOSTNAME}/api/health`;
+  setInterval(() => {
+    fetch(selfUrl).catch(() => undefined);
+  }, 10 * 60 * 1000); // ping every 10 minutes
+}
 app.listen(port, () => {
   console.log(`Aura Voice server listening on http://localhost:${port}`);
   const cfg = getLlmConfig();
