@@ -1,11 +1,4 @@
-# Aura Voice Studio
 
-Browser-based AI voice customer support agent for Aura Skincare (fictional brand). Built for the Datastraw hiring assessment.
-
-**Live demo:** _add your URL after deployment_  
-**Demo video:** _add your video link after recording_
-
----
 
 ## Architecture
 Customer mic

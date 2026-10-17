@@ -1,3 +1,6 @@
+// Central state machine for a voice call.
+// Manages the STT -> LLM -> TTS pipeline, barge-in, and error recovery.
+
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ApiError, fetchSummary, sendChat } from "../api";
 import { MicMeter } from "../voice/mic";

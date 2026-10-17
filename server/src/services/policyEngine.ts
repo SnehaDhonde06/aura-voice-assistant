@@ -1,3 +1,5 @@
+// Deterministic policy rules for Aura Skincare. The LLM receives verdicts
+// from these functions and cannot override or contradict them.
 import type { Order } from "../data/orders.js";
 
 export const POLICY = {

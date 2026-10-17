@@ -1,5 +1,5 @@
-// Aria has no action tools: she can only give information.
-// Any claim that an action was performed is therefore unconfirmed and gets blocked.
+// Output guardrail: blocks any reply claiming an action was performed
+// (cancellation, refund, replacement) since this demo agent has no action tools.
 const ACTION_CLAIMS: RegExp[] = [
   /\b(i|we)(?:'ve|\s+have)?\s+(?:just\s+|now\s+)?(cancel+ed|processed|refunded|initiated|booked|replaced|arranged|escalated)\b/i,
   /\b(?:has|have|had)\s+been\s+(?:cancel+ed|refunded|processed|initiated|replaced|booked)\b/i,

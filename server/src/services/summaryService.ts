@@ -1,3 +1,5 @@
+// Generates the post-call structured summary deterministically, without
+// calling the LLM. Intent is classified from the transcript, not inferred.
 import { z } from "zod";
 import { INTENTS, pickCallIntent, type Intent } from "./intent.js";
 import { getOrderDetails, normalizeOrderId, type OrderLookupResult } from "./orderService.js";

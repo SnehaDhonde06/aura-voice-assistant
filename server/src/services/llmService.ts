@@ -1,3 +1,5 @@
+// Orchestrates the LLM conversation loop with tool execution.
+// Provider-agnostic: works with Groq, Gemini, or OpenAI via llmConfig.ts.
 import { enforceNoUnconfirmedActions, sanitizeForSpeech } from "./guardrail.js";
 import { executeTool, TOOL_DEFINITIONS, type ToolOutcome } from "./tools.js";
 import { getLlmCandidates, type LlmConfig } from "./llmConfig.js";

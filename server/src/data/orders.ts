@@ -1,3 +1,5 @@
+// Mock order database. In production this would be replaced with a read-only
+// database query. The policy engine and tool layer do not need to change.
 export type OrderStatus = "Processing" | "Shipped" | "Out for Delivery" | "Delivered";
 
 export interface Order {

@@ -1,3 +1,5 @@
+// Order lookup with spoken-input normalization.
+// "order one zero one", "ORD101", "ord 101" all resolve to "ORD-101".
 import { findOrder, listOrders, type Order, type OrderStatus } from "../data/orders.js";
 import {
   checkCancellation,

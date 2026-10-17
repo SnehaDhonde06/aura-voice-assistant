@@ -1,3 +1,6 @@
+// Swappable TTS layer. BrowserTts uses speechSynthesis (free, no setup).
+// Set VITE_TTS_PROVIDER=elevenlabs and add server keys for premium voice.
+
 import { API_BASE } from "../api";
 
 export interface TtsProvider {

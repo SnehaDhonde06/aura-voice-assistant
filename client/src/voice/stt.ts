@@ -1,3 +1,5 @@
+// Browser speech recognition with dual en-IN + hi-IN recognizers for Hinglish.
+// Falls back to text input in browsers that don't support Web Speech API.
 export interface SttEvents {
   onInterim(text: string): void;
   onFinal(text: string): void;
