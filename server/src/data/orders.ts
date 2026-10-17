@@ -46,6 +46,34 @@ const ORDERS: readonly Order[] = [
     status: "Processing",
     orderedHoursAgo: 3,
   },
+    {
+    orderId: "ORD-104",
+    customerName: "Meera Iyer",
+    product: "Rose Hip Face Oil (15ml)",
+    valueInr: 1299,
+    status: "Shipped",
+    carrier: "Ekart",
+    trackingId: "EK-774421",
+    expectedDelivery: "tomorrow by 8 PM",
+  },
+  {
+    orderId: "ORD-105",
+    customerName: "Karan Mehta",
+    product: "Niacinamide Serum + Moisturiser Combo",
+    valueInr: 1850,
+    status: "Delivered",
+    carrier: "BlueDart",
+    trackingId: "BD-334892",
+    deliveredDaysAgo: 3,
+  },
+  {
+    orderId: "ORD-106",
+    customerName: "Divya Nair",
+    product: "Kumkumadi Night Cream (50g)",
+    valueInr: 449,
+    status: "Processing",
+    orderedHoursAgo: 1,
+  },
 ];
 
 export function findOrder(id: string): Order | undefined {
